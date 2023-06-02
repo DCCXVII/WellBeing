@@ -15,7 +15,7 @@ class GuestPageController extends Controller
     //
     public function index(Request $request)
     {
-        $discipline = Discipline::with('classes')->select('id', 'titre', 'discipline_description')->get();
+        $discipline = Discipline::with('classes')->select('id', 'titre', 'discipline_description', 'background_img')->get();
         $instructors = User::role('instructor')->select('id', 'name', 'email', 'description', 'img_url')->get();
 
         return response([
@@ -55,40 +55,40 @@ class GuestPageController extends Controller
     public function explore(Request $request)
     {
 
-        $query = Course::query()->with(['discipline:name', 'classe:name', 'User:name']);
+        $query = Course::query();
 
         if ($request->has('id')) {
             $query->where('id', $request->input('id'));
         }
-    
+
         if ($request->has('discipline_id')) {
             $query->where('discipline_id', $request->input('discipline_id'));
         }
-    
+
         if ($request->has('classe_id')) {
             $query->where('classe_id', $request->input('classe_id'));
         }
-    
+
         if ($request->has('instructor_id')) {
             $query->where('instructor_id', $request->input('User_id'));
         }
-    
+
         if ($request->has('duration')) {
             $duration = $request->input('duration');
             $query->whereTime('duration', '>=', $duration);
         }
-    
+
         if ($request->has('difficulty')) {
             $query->where('niveau', $request->input('difficulty'));
         }
-    
-        $courses = $query->select('id', 'titre', 'description', 'price', 'background_image', 'niveau','views_number','sells_number')->get();
-    
+
+        $courses = $query->select('id', 'titre', 'description', 'price', 'duration', 'background_image', 'niveau', 'views_number', 'sells_number')->get();
+
         return response()->json([
             'courses' => $courses,
         ]);
     }
- 
+
     public function getInstructors(Request $request)
     {
 
@@ -106,6 +106,14 @@ class GuestPageController extends Controller
             'instructors' => $instructors,
         ]);
     }
+
+    public function getCoursesByDiscipline($disciplineId)
+    {
+        $courses = Course::where('discipline_id', $disciplineId)->select('id', 'titre', 'description', 'price', 'background_image', 'niveau', 'views_number', 'sells_number')->get();
+
+        return response()->json($courses);
+    }
+
 
     // public function getInstructorById($id)
     // {
