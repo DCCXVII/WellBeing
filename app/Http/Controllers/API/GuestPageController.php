@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Discipline;
 use App\Models\User;
 use App\Models\Course;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class GuestPageController extends Controller
 {
@@ -40,7 +42,7 @@ class GuestPageController extends Controller
             });
         }
 
-        $query->with('classes.classes');
+        $query->with('classes.courses');
 
         $discipline = $query->get();
         //$courses = Course::where('dicipline_id', $request['id']);
@@ -86,9 +88,29 @@ class GuestPageController extends Controller
             'courses' => $courses,
         ]);
     }
+ 
+    public function getInstructors(Request $request)
+    {
 
-    public function getInstructors(Request $request){
-         
-        $instructor = User::
+        $instructorRole = Role::where('name', 'instructor')->firstOrFail();
+        $query = DB::table('users')
+            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('model_has_roles.role_id', $instructorRole->id);
+        if ($request->has('id')) {
+            $query->where('users.id', $request->input('id'));
+        }
+
+        $instructors = $query->select('users.*')->get();
+
+        return response()->json([
+            'instructors' => $instructors,
+        ]);
     }
+
+    // public function getInstructorById($id)
+    // {
+    //     $instructorRole = Role::where('name', 'instructor')->firstOrFail();
+    //     $instructor = $instructorRole->users->where('id', $id);
+    //     return response()->json($instructor);
+    // }
 }

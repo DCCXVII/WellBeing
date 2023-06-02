@@ -23,10 +23,7 @@ return new class extends Migration
             $table->bigInteger('views_number');
             $table->bigInteger('sells_number');
         });
-        Schema::table('courses', function (Blueprint $table) {
-            $table->bigInteger('views_number');
-            $table->bigInteger('sells_number');
-        });
+        
         Schema::table('packs', function (Blueprint $table) {
             $table->bigInteger('views_number');
             $table->bigInteger('sells_number');
