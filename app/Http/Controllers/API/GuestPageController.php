@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Discipline;
 use App\Models\User;
 use App\Models\Course;
+use App\Models\Pack;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
@@ -113,6 +114,26 @@ class GuestPageController extends Controller
 
         return response()->json($courses);
     }
+
+    public function getCourseById($id)
+{
+    $course = Course::find($id);
+
+    if (!$course) {
+        return response()->json(['error' => 'Course not found'], 404);
+    }
+
+    return response()->json($course);
+}
+
+
+public function getPacks()
+{
+    $packs = Pack::select('id', 'titre', 'description', 'niveau', 'price', 'coach_id', 'discipline_id', 'created_at', 'updated_at', 'views_number', 'sells_number', 'status', 'background_image')->get();
+
+    return response()->json($packs, 200);
+}
+
 
 
     // public function getInstructorById($id)

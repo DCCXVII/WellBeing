@@ -31,8 +31,10 @@ Route::controller(GuestPageController::class)->group(function () {
     Route::get('/', 'index');
     Route::get('/instructors', 'getInstructors');
     Route::get('/discipline', 'discipline');
-    Route::get('/series', 'getPacks');
+    Route::get('/packs', 'getPacks');
     Route::get('/explore', 'explore');
+    // Route::get('/courses/{id}', 'getCourseById');
+
 });
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
     ->middleware('auth:sanctum')
