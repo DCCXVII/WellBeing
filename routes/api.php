@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
+
+    // ---- CHANGE -------
     Route::post('/change-password', 'changePassword')->middleware('auth:sanctum');
 });
 
@@ -31,10 +33,9 @@ Route::controller(GuestPageController::class)->group(function () {
     Route::get('/', 'index');
     Route::get('/instructors', 'getInstructors');
     Route::get('/discipline', 'discipline');
+    // ---- NO CHANGER ------- 
     Route::get('/packs', 'getPacks');
     Route::get('/explore', 'explore');
-    // Route::get('/courses/{id}', 'getCourseById');
-
 });
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
     ->middleware('auth:sanctum')
@@ -49,7 +50,7 @@ Route::group(['prefix' => 'instructor', 'middleware' => ['auth:sanctum', 'role:i
         Route::get('/courses/{id}', 'getCourseById');
         Route::get('/discipline/{id}','getCoursesByDiscipline');
         Route::post('/create-pack', 'createpack');
-        Route::post('/courses/{cid}/edit', 'editCourse');
+        Route::post('/courses/{id}/edit', 'editCourse');
         Route::put('/packs/{id}/edit', 'editPack');
         Route::get('/packs', 'getPack');
         Route::get('/packs/{id}', 'getPackById');
@@ -57,7 +58,6 @@ Route::group(['prefix' => 'instructor', 'middleware' => ['auth:sanctum', 'role:i
         Route::delete('/delete-pack/{id}', 'deletePack');
         Route::get('/profile', 'getProfile');
         Route::put('/edit-profile', 'editProfile');
-        //route for required password change 
         Route::post('/change-password', 'changePassword')->middleware('password.change');
     });
 });
@@ -97,5 +97,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/profile', 'getProfile');
         Route::put('/edit-profile', 'editProfile');
         Route::post('/change-password', 'changePassword');
+        Route::post('/become-instructor', 'becomeInstructor');
     });
 });

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Application;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
 
 class UserController extends Controller
 {
@@ -102,5 +105,53 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password changed successfully'], 200);
+    }
+
+    public function becomeInstructor(Request $request)
+    {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'phone_number' => 'required|string',
+            'cv' => 'required|mimes:pdf',
+        ]);
+
+        if ($validator->fails()) {
+            // Handle validation errors
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Get the authenticated user
+        $user = auth()->user();
+
+        // Update the user's information
+        $application = new Application();
+
+
+
+        // Save the user's updated information
+
+
+        // Handle the uploaded CV file
+        if ($request->hasFile('cv')) {
+            $application->phone_number = $request->phone_number;
+            $application->user_id = $user->id;
+
+            $cv = $request->file('cv');
+
+            // Generate a unique file name
+            $fileName = time() . '.' . $cv->getClientOriginalExtension();
+
+            // Move the CV file to a directory
+            $cv->move(public_path('cv'), $fileName);
+
+            // Save the CV file path in the user's record
+            $application->cv_path =  url('/cv/' . $fileName);
+
+            // Save the user's updated information again
+            $application->save();
+        }
+
+        // Return a success response
+        return response()->json(['message' => 'Request to become an instructor submitted successfully']);
     }
 }

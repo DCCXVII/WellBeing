@@ -83,7 +83,14 @@ class GuestPageController extends Controller
             $query->where('niveau', $request->input('difficulty'));
         }
 
-        $courses = $query->select('id', 'titre', 'description', 'price', 'duration', 'background_image', 'niveau', 'views_number', 'sells_number')->get();
+
+
+        $courses = $query->where('status', '=', 'accepté')->get();
+        foreach ($courses as $course) {
+            $course['url'] = null;
+        }
+
+
 
         return response()->json([
             'courses' => $courses,
@@ -116,30 +123,32 @@ class GuestPageController extends Controller
     }
 
     public function getCourseById($id)
-{
-    $course = Course::find($id);
+    {
+        $course = Course::find($id);
 
-    if (!$course) {
-        return response()->json(['error' => 'Course not found'], 404);
+        if (!$course) {
+            return response()->json(['error' => 'Course not found'], 404);
+        }
+
+        return response()->json($course);
     }
 
-    return response()->json($course);
-}
 
+    public function getPacks()
+    {
+        $packs = Pack::select('id', 'titre', 'description', 'niveau', 'price', 'coach_id', 'discipline_id', 'created_at', 'updated_at', 'views_number', 'sells_number', 'status', 'background_image')->get();
 
-public function getPacks()
-{
-    $packs = Pack::select('id', 'titre', 'description', 'niveau', 'price', 'coach_id', 'discipline_id', 'created_at', 'updated_at', 'views_number', 'sells_number', 'status', 'background_image')->get();
-
-    return response()->json($packs, 200);
-}
+        return response()->json($packs, 200);
+    }
 
 
 
-    // public function getInstructorById($id)
-    // {
-    //     $instructorRole = Role::where('name', 'instructor')->firstOrFail();
-    //     $instructor = $instructorRole->users->where('id', $id);
-    //     return response()->json($instructor);
-    // }
+    public function getInstructorById($id)
+    {
+        $instructorRole = Role::where('name', 'instructor')->firstOrFail();
+        $instructor = $instructorRole->users->where('id', $id)->map(function ($user) {
+            return $user->only(['id', 'name', 'email', 'background_img', 'description', 'img_url']);
+        });
+        return response()->json($instructor);
+    }
 }
